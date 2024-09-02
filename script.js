@@ -5,11 +5,6 @@ const difficultySelect = document.getElementById("difficulty");
 const loadingScreen = document.getElementById("loading-screen");
 const endPopup = document.getElementById("end-popup");
 const endMessage = document.getElementById("end-message");
-const restartButton = document.createElement("button");
-restartButton.textContent = "Restart";
-restartButton.onclick = initMaze;
-document.body.appendChild(restartButton);
-restartButton.classList.add("hidden");
 
 let playerPosition = { x: 0, y: 0 };
 let timer = 0;
@@ -25,10 +20,12 @@ function initMaze() {
   startTimer();
   messageElement.textContent = "";
   loadingScreen.classList.add("hidden");
+  document.getElementById("game-container").classList.remove("hidden");
   mazeContainer.classList.remove("hidden");
   timerElement.classList.remove("hidden");
   messageElement.classList.remove("hidden");
-  restartButton.classList.remove("hidden");
+  document.getElementById("restart-button").classList.remove("hidden");
+  removeNeonBoxes();
 }
 
 // Generate a maze ensuring there's always a path from start to end
@@ -67,18 +64,30 @@ function generateMaze(rows, cols) {
     }
   }
 
-  // Carve the initial path
   carvePath(0, 0);
 
   // Ensure the end is reachable
-  maze[rows - 1][cols - 1] = "path";
+  let endX = cols - 1;
+  let endY = rows - 1;
+  while (maze[endY][endX] === "wall") {
+    if (endX > 0 && maze[endY][endX - 1] === "path") {
+      maze[endY][endX] = "path";
+    } else if (endY > 0 && maze[endY - 1][endX] === "path") {
+      maze[endY][endX] = "path";
+    } else {
+      endX--;
+      endY--;
+    }
+  }
 
-  // Randomly add walls while keeping the path
+  // Adjust wall density based on difficulty
+  const wallProbability = mazeSize <= 10 ? 0.2 : mazeSize <= 20 ? 0.3 : 0.4;
+
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       if (
         maze[y][x] === "path" &&
-        Math.random() < 0.3 &&
+        Math.random() < wallProbability &&
         !(x === 0 && y === 0) &&
         !(x === cols - 1 && y === rows - 1)
       ) {
@@ -164,11 +173,57 @@ function startTimer() {
 function showLoadingScreen() {
   endPopup.classList.add("hidden");
   loadingScreen.classList.remove("hidden");
+  document.getElementById("game-container").classList.add("hidden");
   mazeContainer.classList.add("hidden");
   timerElement.classList.add("hidden");
   messageElement.classList.add("hidden");
-  restartButton.classList.add("hidden");
+  document.getElementById("restart-button").classList.add("hidden");
+  createNeonBoxes();
+}
+
+function createNeonBoxes() {
+  const container = document.getElementById("neon-box-container");
+  const colors = [
+    "#ff00ff",
+    "#00ffff",
+    "#ffff00",
+    "#ff0000",
+    "#00ff00",
+    "#0000ff",
+  ];
+  const numBoxes = 20;
+
+  container.innerHTML = ""; // Clear existing boxes
+
+  for (let i = 0; i < numBoxes; i++) {
+    const box = document.createElement("div");
+    box.classList.add("neon-box");
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    box.style.borderColor = color;
+    box.style.backgroundColor = color;
+    box.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}, 0 0 30px ${color}`;
+
+    const startX = Math.random() * 100;
+    const startY = Math.random() * 100;
+    const endX = Math.random() * 100;
+    const endY = Math.random() * 100;
+
+    box.style.setProperty("--start-x", `${startX}vw`);
+    box.style.setProperty("--start-y", `${startY}vh`);
+    box.style.setProperty("--end-x", `${endX}vw`);
+    box.style.setProperty("--end-y", `${endY}vh`);
+
+    box.style.animationDuration = `${5 + Math.random() * 5}s`;
+    box.style.animationDelay = `${Math.random() * 5}s`;
+    container.appendChild(box);
+  }
+}
+
+function removeNeonBoxes() {
+  const container = document.getElementById("neon-box-container");
+  container.innerHTML = "";
 }
 
 // Initialize the game
 showLoadingScreen();
+createNeonBoxes();

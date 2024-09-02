@@ -5,9 +5,9 @@ body {
   justify-content: center;
   height: 100vh;
   margin: 0;
-  background-color: #b1b1b1; /* Lighter background color */
-  color: #333; /* Darker text color */
-  font-family: "Arial", sans-serif;
+  background-color: #1a1a2e;
+  color: #fff;
+  font-family: "Press Start 2P", cursive;
 }
 
 .hidden {
@@ -25,31 +25,60 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  background-color: rgba(26, 26, 46, 0.9);
+  animation: fadeIn 0.5s ease-out;
+}
+
+#end-popup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(26, 26, 46, 1);
+  animation: fadeIn 0.5s ease-out;
+  z-index: 1000;
+}
+
+.game-title {
+  font-size: 48px;
+  margin-bottom: 40px;
+  text-shadow: 0 0 10px #00ff00;
+  animation: slideIn 0.5s ease-out;
+}
+
+.difficulty-selector {
+  margin-bottom: 20px;
+  animation: slideIn 0.5s ease-out 0.2s both;
 }
 
 #maze-container {
   display: grid;
   gap: 2px;
   margin-top: 20px;
+  animation: fadeIn 0.5s ease-out;
 }
 
 .cell {
   width: 20px;
   height: 20px;
-  background-color: #fff;
+  background-color: #16213e;
   border-radius: 4px;
   transition: background-color 0.3s, transform 0.3s;
 }
 
 .wall {
-  background-color: #333; /* Darker wall color */
+  background-color: #0f3460;
 }
 
 .player {
-  background-color: #ff0000; /* Red player color */
+  background-color: #e94560;
   transform: scale(1.2);
+  box-shadow: 0 0 10px #e94560;
 }
 
 .start {
@@ -63,51 +92,123 @@ body {
 #timer {
   margin-top: 20px;
   font-size: 24px;
-}
-
-#controls {
-  margin-bottom: 20px;
-}
-
-#controls label,
-#controls select,
-#controls button {
-  font-size: 18px;
-  margin-right: 10px;
+  animation: slideIn 0.5s ease-out;
 }
 
 #message {
   margin-top: 20px;
   font-size: 24px;
   color: #32cd32;
+  animation: slideIn 0.5s ease-out;
 }
 
 button {
   padding: 10px 20px;
   font-size: 18px;
-  background-color: #61dafb;
+  background-color: #e94560;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.3s;
+  font-family: "Press Start 2P", cursive;
+  color: #fff;
 }
 
 button:hover {
-  background-color: #21a1f1;
+  background-color: #ff6b6b;
+  transform: scale(1.05);
 }
 
-/* Style the dropdown list */
 select {
   padding: 10px;
   font-size: 18px;
-  border: 1px solid #ccc;
+  border: 2px solid #e94560;
   border-radius: 5px;
-  background-color: #fff;
-  color: #333;
+  background-color: #16213e;
+  color: #fff;
   cursor: pointer;
   transition: background-color 0.3s;
+  font-family: "Press Start 2P", cursive;
 }
 
 select:hover {
-  background-color: #f0f0f0;
+  background-color: #1e2749;
+}
+
+#game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#restart-button {
+  margin-top: 20px;
+}
+
+#end-popup h2 {
+  font-size: 36px;
+  margin-bottom: 20px;
+  animation: slideIn 0.5s ease-out;
+}
+
+#end-message {
+  font-size: 24px;
+  margin-bottom: 20px;
+  animation: slideIn 0.5s ease-out 0.2s both;
+}
+
+.play-again-button {
+  animation: slideIn 0.5s ease-out 0.4s both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+#neon-box-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1; /* Changed from 1 to -1 to ensure it stays behind other elements */
+}
+
+.neon-box {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border: 2px solid;
+  border-radius: 8px;
+  opacity: 0.1; /* Reduced opacity from 0.7 to 0.3 */
+  animation: moveBox 5s linear infinite;
+  box-shadow: 0 0 10px currentColor, 0 0 20px currentColor,
+    0 0 30px currentColor;
+}
+
+@keyframes moveBox {
+  0%,
+  100% {
+    transform: translate(var(--start-x), var(--start-y));
+  }
+  50% {
+    transform: translate(var(--end-x), var(--end-y));
+  }
 }

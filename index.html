@@ -5,24 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Maze Game</title>
     <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="loading-screen">
-      <label for="difficulty">Select Difficulty:</label>
-      <select id="difficulty">
-        <option value="10">Easy</option>
-        <option value="15">Medium</option>
-        <option value="20">Hard</option>
-        <option value="30">Hell</option>
-      </select>
-      <button onclick="initMaze()">Start Game</button>
+      <h1 class="game-title">Maze Game</h1>
+      <div class="difficulty-selector">
+        <label for="difficulty">Select Difficulty:</label>
+        <select id="difficulty">
+          <option value="10">Easy</option>
+          <option value="15">Medium</option>
+          <option value="20">Hard</option>
+          <option value="30">Hell</option>
+        </select>
+      </div>
+      <button onclick="initMaze()" class="start-button">Start Game</button>
     </div>
-    <div id="maze-container" class="hidden"></div>
-    <div id="timer" class="hidden">Time: 0</div>
+    <div id="neon-box-container"></div>
+    <div id="game-container" class="hidden">
+      <div id="maze-container"></div>
+      <div id="timer">Time: 0</div>
+      <button id="restart-button" onclick="initMaze()">Restart</button>
+    </div>
     <div id="message" class="hidden"></div>
     <div id="end-popup" class="hidden">
+      <h2>Congratulations!</h2>
       <div id="end-message"></div>
-      <button onclick="showLoadingScreen()">Play Again</button>
+      <button onclick="showLoadingScreen()" class="play-again-button">
+        Play Again
+      </button>
     </div>
     <script src="script.js"></script>
   </body>
