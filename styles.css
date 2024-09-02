@@ -212,3 +212,8 @@ select:hover {
     transform: translate(var(--end-x), var(--end-y));
   }
 }
+
+.path-highlight {
+  background-color: #ffd700 !important;
+  transition: background-color 0.3s;
+}
