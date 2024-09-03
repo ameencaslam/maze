@@ -27,6 +27,9 @@ function initMaze() {
   document.getElementById("restart-button").classList.remove("hidden");
   document.getElementById("show-path-button").classList.remove("hidden");
   removeNeonBoxes();
+
+  // Request fullscreen
+  requestFullscreen();
 }
 
 // Generate a maze ensuring there's always a path from start to end
@@ -421,3 +424,34 @@ window.addEventListener("orientationchange", checkOrientation);
 window.addEventListener("resize", resizeMaze);
 
 window.addEventListener("resize", resizeMaze);
+
+// Add this function to request fullscreen
+function requestFullscreen() {
+  const gameContainer = document.getElementById("game-container");
+  if (gameContainer.requestFullscreen) {
+    gameContainer.requestFullscreen();
+  } else if (gameContainer.mozRequestFullScreen) {
+    // Firefox
+    gameContainer.mozRequestFullScreen();
+  } else if (gameContainer.webkitRequestFullscreen) {
+    // Chrome, Safari and Opera
+    gameContainer.webkitRequestFullscreen();
+  } else if (gameContainer.msRequestFullscreen) {
+    // IE/Edge
+    gameContainer.msRequestFullscreen();
+  }
+}
+
+// Add an event listener to handle fullscreen changes
+document.addEventListener("fullscreenchange", handleFullscreenChange);
+document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+document.addEventListener("msfullscreenchange", handleFullscreenChange);
+
+function handleFullscreenChange() {
+  if (document.fullscreenElement) {
+    console.log("Entered fullscreen mode");
+  } else {
+    console.log("Exited fullscreen mode");
+  }
+}
