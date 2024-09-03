@@ -175,8 +175,19 @@ function placePlayer() {
 }
 
 // Handle player movement
-document.addEventListener("keydown", (e) => {
-  const key = e.key;
+document.addEventListener("keydown", handleKeyPress);
+document.addEventListener("keyup", handleKeyUp);
+
+function handleKeyPress(e) {
+  movePlayerByKey(e.key);
+  highlightKey(e.key, true);
+}
+
+function handleKeyUp(e) {
+  highlightKey(e.key, false);
+}
+
+function movePlayerByKey(key) {
   const { x, y } = playerPosition;
   let newX = x,
     newY = y;
@@ -187,7 +198,42 @@ document.addEventListener("keydown", (e) => {
   if (key === "ArrowRight" && x < mazeSize - 1) newX++;
 
   movePlayer(newX, newY);
-});
+}
+
+function highlightKey(key, isActive) {
+  const keyElement = document.querySelector(`.arrow-key[data-key="${key}"]`);
+  if (keyElement) {
+    if (isActive) {
+      keyElement.classList.add("active");
+    } else {
+      keyElement.classList.remove("active");
+    }
+  }
+}
+
+// Set up virtual keyboard
+const virtualKeyboard = document.getElementById("virtual-keyboard");
+virtualKeyboard.addEventListener("touchstart", handleVirtualKeyPress);
+virtualKeyboard.addEventListener("touchend", handleVirtualKeyUp);
+virtualKeyboard.addEventListener("mousedown", handleVirtualKeyPress);
+virtualKeyboard.addEventListener("mouseup", handleVirtualKeyUp);
+
+function handleVirtualKeyPress(e) {
+  e.preventDefault();
+  const key = e.target.getAttribute("data-key");
+  if (key) {
+    movePlayerByKey(key);
+    highlightKey(key, true);
+  }
+}
+
+function handleVirtualKeyUp(e) {
+  e.preventDefault();
+  const key = e.target.getAttribute("data-key");
+  if (key) {
+    highlightKey(key, false);
+  }
+}
 
 function movePlayer(newX, newY) {
   const newIndex = newY * mazeSize + newX;

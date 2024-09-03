@@ -1,6 +1,6 @@
 body {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   height: 100vh;
@@ -45,14 +45,14 @@ body {
 }
 
 .game-title {
-  font-size: 48px;
+  font-size: 70px;
   margin-bottom: 40px;
   text-shadow: 0 0 10px #00ff00;
   animation: slideIn 0.5s ease-out;
 }
 
 .difficulty-selector {
-  margin-bottom: 20px;
+  margin-bottom: 35px;
   animation: slideIn 0.5s ease-out 0.2s both;
 }
 
@@ -61,22 +61,25 @@ body {
   gap: 2px;
   margin-top: 20px;
   animation: fadeIn 0.5s ease-out;
+  border: 4px solid #e94560;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .cell {
   width: 20px;
   height: 20px;
-  background-color: #16213e;
+  background-color: #1a1a2e;
   border-radius: 4px;
   transition: background-color 0.3s, transform 0.3s;
 }
 
 .wall {
-  background-color: #0f3460;
+  background-color: #86a1db;
 }
 
 .player {
-  background-color: #e94560;
+  background-color: #ff002b;
   transform: scale(1.2);
   box-shadow: 0 0 10px #e94560;
 }
@@ -137,12 +140,18 @@ select:hover {
 
 #game-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  width: 90%;
+  max-width: 1200px;
+  gap: 100px; /* Add space between maze and controls */
 }
 
-#restart-button {
+#restart-button,
+#show-path-button {
   margin-top: 20px;
+  margin-bottom: 20px; /* Add space between buttons */
 }
 
 #end-popup h2 {
@@ -159,6 +168,83 @@ select:hover {
 
 .play-again-button {
   animation: slideIn 0.5s ease-out 0.4s both;
+}
+
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#virtual-keyboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 40px; /* Increase space above virtual keyboard */
+}
+
+.arrow-key {
+  width: 60px;
+  height: 60px;
+  background-color: #e94560;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px; /* Reduced font size for better fit */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  font-family: "Press Start 2P", cursive;
+}
+
+/* Add this to ensure text is centered */
+.arrow-key span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.arrow-key:hover,
+.arrow-key.active {
+  background-color: #ff6b6b;
+  transform: scale(1.05);
+}
+
+.arrow-key:nth-child(1) {
+  grid-column: 2;
+}
+.arrow-key:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+.arrow-key:nth-child(3) {
+  grid-column: 2;
+  grid-row: 2;
+}
+.arrow-key:nth-child(4) {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+@media (max-width: 768px) {
+  #game-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Reduce gap for mobile */
+  }
+
+  .controls-container {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+
+  #virtual-keyboard {
+    margin-top: 20px; /* Reduce space above virtual keyboard for mobile */
+  }
 }
 
 @keyframes fadeIn {
