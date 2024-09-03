@@ -168,8 +168,8 @@ function renderMaze(maze) {
     row.forEach((cell, x) => {
       const div = document.createElement("div");
       div.className = `cell ${cell}`;
-      div.style.width = `${cellSize}px`;
-      div.style.height = `${cellSize}px`;
+      div.style.width = `${cellSize - 3}px`;
+      div.style.height = `${cellSize - 3}px`;
       mazeContainer.appendChild(div);
     });
   });
