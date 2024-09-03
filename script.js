@@ -156,15 +156,31 @@ function shuffle(array) {
 // Render the maze
 function renderMaze(maze) {
   mazeContainer.innerHTML = "";
-  mazeContainer.style.gridTemplateColumns = `repeat(${mazeSize}, 20px)`;
-  mazeContainer.style.gridTemplateRows = `repeat(${mazeSize}, 20px)`;
-  maze.forEach((row) => {
-    row.forEach((cell) => {
+  const cellSize = calculateCellSize(mazeSize);
+  const mazeWidth = cellSize * mazeSize;
+
+  mazeContainer.style.width = `${mazeWidth}px`;
+  mazeContainer.style.height = `${mazeWidth}px`;
+  mazeContainer.style.gridTemplateColumns = `repeat(${mazeSize}, 1fr)`;
+  mazeContainer.style.gridTemplateRows = `repeat(${mazeSize}, 1fr)`;
+
+  maze.forEach((row, y) => {
+    row.forEach((cell, x) => {
       const div = document.createElement("div");
       div.className = `cell ${cell}`;
+      div.style.width = `${cellSize}px`;
+      div.style.height = `${cellSize}px`;
       mazeContainer.appendChild(div);
     });
   });
+}
+
+function calculateCellSize(mazeSize) {
+  const isMobile = window.innerWidth <= 768;
+  const maxSize = isMobile
+    ? Math.min(window.innerWidth, window.innerHeight) * 0.8
+    : Math.min(window.innerWidth * 0.8, window.innerHeight * 0.8);
+  return Math.floor(maxSize / mazeSize);
 }
 
 // Place the player at the start position
@@ -368,6 +384,7 @@ function checkOrientation() {
       loadingScreen.classList.remove("hidden");
       if (!gameContainer.classList.contains("hidden")) {
         gameContainer.classList.remove("hidden");
+        resizeMaze();
       }
       if (!endPopup.classList.contains("hidden")) {
         endPopup.classList.remove("hidden");
@@ -377,10 +394,30 @@ function checkOrientation() {
     // Desktop view
     rotationMessage.classList.add("hidden");
     loadingScreen.classList.remove("hidden");
+    if (!gameContainer.classList.contains("hidden")) {
+      resizeMaze();
+    }
   }
+}
+
+function resizeMaze() {
+  const cellSize = calculateCellSize(mazeSize);
+  const mazeWidth = cellSize * mazeSize;
+
+  mazeContainer.style.width = `${mazeWidth}px`;
+  mazeContainer.style.height = `${mazeWidth}px`;
+
+  const cells = mazeContainer.querySelectorAll(".cell");
+  cells.forEach((cell) => {
+    cell.style.width = `${cellSize}px`;
+    cell.style.height = `${cellSize}px`;
+  });
 }
 
 // Call checkOrientation on page load and when the window is resized or orientation changes
 window.addEventListener("load", checkOrientation);
 window.addEventListener("resize", checkOrientation);
 window.addEventListener("orientationchange", checkOrientation);
+window.addEventListener("resize", resizeMaze);
+
+window.addEventListener("resize", resizeMaze);
