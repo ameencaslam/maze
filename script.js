@@ -424,41 +424,76 @@ window.addEventListener("resize", resizeMaze);
 
 // Function to enter fullscreen
 function enterFullscreen() {
-  const gameContainer = document.getElementById("game-container");
-  if (gameContainer.requestFullscreen) {
-    gameContainer.requestFullscreen();
-  } else if (gameContainer.mozRequestFullScreen) {
-    // Firefox
-    gameContainer.mozRequestFullScreen();
-  } else if (gameContainer.webkitRequestFullscreen) {
-    // Chrome, Safari and Opera
-    gameContainer.webkitRequestFullscreen();
-  } else if (gameContainer.msRequestFullscreen) {
-    // IE/Edge
-    gameContainer.msRequestFullscreen();
+  const body = document.body;
+  if (body.requestFullscreen) {
+    body.requestFullscreen();
+  } else if (body.mozRequestFullScreen) {
+    body.mozRequestFullScreen();
+  } else if (body.webkitRequestFullscreen) {
+    body.webkitRequestFullscreen();
+  } else if (body.msRequestFullscreen) {
+    body.msRequestFullscreen();
   }
 
-  // Hide the fullscreen prompt and show the loading screen
+  // Hide the fullscreen prompt
   document.getElementById("fullscreen-prompt").classList.add("hidden");
+
+  // Show loading screen immediately
   showLoadingScreen();
   createNeonBoxes();
+}
+
+// Modify the handleFullscreenChange function
+function handleFullscreenChange() {
+  if (document.fullscreenElement) {
+    console.log("Entered fullscreen mode");
+    checkOrientation();
+    resizeMaze();
+  } else {
+    console.log("Exited fullscreen mode");
+    checkOrientation();
+    resizeMaze();
+  }
+}
+
+// Modify the showLoadingScreen function
+function showLoadingScreen() {
+  endPopup.classList.add("hidden");
+  loadingScreen.classList.remove("hidden");
+  document.getElementById("game-container").classList.add("hidden");
+  mazeContainer.classList.add("hidden");
+  timerElement.classList.add("hidden");
+  messageElement.classList.add("hidden");
+  document.getElementById("restart-button").classList.add("hidden");
+
+  // Ensure loading screen is visible and interactive
+  loadingScreen.style.zIndex = "2001";
+  loadingScreen.style.pointerEvents = "auto";
+
+  // Re-add event listeners
+  const startButton = loadingScreen.querySelector(".start-button");
+  startButton.addEventListener("click", initMaze);
+
+  const difficultySelect = document.getElementById("difficulty");
+  difficultySelect.addEventListener("change", () => {
+    mazeSize = parseInt(difficultySelect.value);
+  });
 }
 
 // Call this function on page load to show the fullscreen prompt
 window.addEventListener("load", () => {
   document.getElementById("fullscreen-prompt").classList.remove("hidden");
+  checkOrientation();
 });
 
-// Add an event listener to handle fullscreen changes
+// Add event listeners
+window.addEventListener("resize", () => {
+  checkOrientation();
+  resizeMaze();
+});
+window.addEventListener("orientationchange", checkOrientation);
+
 document.addEventListener("fullscreenchange", handleFullscreenChange);
 document.addEventListener("mozfullscreenchange", handleFullscreenChange);
 document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
 document.addEventListener("msfullscreenchange", handleFullscreenChange);
-
-function handleFullscreenChange() {
-  if (document.fullscreenElement) {
-    console.log("Entered fullscreen mode");
-  } else {
-    console.log("Exited fullscreen mode");
-  }
-}
