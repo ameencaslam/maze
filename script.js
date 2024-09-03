@@ -156,15 +156,31 @@ function shuffle(array) {
 // Render the maze
 function renderMaze(maze) {
   mazeContainer.innerHTML = "";
-  mazeContainer.style.gridTemplateColumns = `repeat(${mazeSize}, 20px)`;
-  mazeContainer.style.gridTemplateRows = `repeat(${mazeSize}, 20px)`;
-  maze.forEach((row) => {
-    row.forEach((cell) => {
+  const cellSize = calculateCellSize(mazeSize);
+  const mazeWidth = cellSize * mazeSize;
+
+  mazeContainer.style.width = `${mazeWidth}px`;
+  mazeContainer.style.height = `${mazeWidth}px`;
+  mazeContainer.style.gridTemplateColumns = `repeat(${mazeSize}, 1fr)`;
+  mazeContainer.style.gridTemplateRows = `repeat(${mazeSize}, 1fr)`;
+
+  maze.forEach((row, y) => {
+    row.forEach((cell, x) => {
       const div = document.createElement("div");
       div.className = `cell ${cell}`;
+      div.style.width = `${cellSize - 3}px`;
+      div.style.height = `${cellSize - 3}px`;
       mazeContainer.appendChild(div);
     });
   });
+}
+
+function calculateCellSize(mazeSize) {
+  const isMobile = window.innerWidth <= 768;
+  const maxSize = isMobile
+    ? Math.min(window.innerWidth, window.innerHeight) * 0.8
+    : Math.min(window.innerWidth * 0.8, window.innerHeight * 0.8);
+  return Math.floor(maxSize / mazeSize);
 }
 
 // Place the player at the start position
@@ -175,8 +191,19 @@ function placePlayer() {
 }
 
 // Handle player movement
-document.addEventListener("keydown", (e) => {
-  const key = e.key;
+document.addEventListener("keydown", handleKeyPress);
+document.addEventListener("keyup", handleKeyUp);
+
+function handleKeyPress(e) {
+  movePlayerByKey(e.key);
+  highlightKey(e.key, true);
+}
+
+function handleKeyUp(e) {
+  highlightKey(e.key, false);
+}
+
+function movePlayerByKey(key) {
   const { x, y } = playerPosition;
   let newX = x,
     newY = y;
@@ -187,7 +214,42 @@ document.addEventListener("keydown", (e) => {
   if (key === "ArrowRight" && x < mazeSize - 1) newX++;
 
   movePlayer(newX, newY);
-});
+}
+
+function highlightKey(key, isActive) {
+  const keyElement = document.querySelector(`.arrow-key[data-key="${key}"]`);
+  if (keyElement) {
+    if (isActive) {
+      keyElement.classList.add("active");
+    } else {
+      keyElement.classList.remove("active");
+    }
+  }
+}
+
+// Set up virtual keyboard
+const virtualKeyboard = document.getElementById("virtual-keyboard");
+virtualKeyboard.addEventListener("touchstart", handleVirtualKeyPress);
+virtualKeyboard.addEventListener("touchend", handleVirtualKeyUp);
+virtualKeyboard.addEventListener("mousedown", handleVirtualKeyPress);
+virtualKeyboard.addEventListener("mouseup", handleVirtualKeyUp);
+
+function handleVirtualKeyPress(e) {
+  e.preventDefault();
+  const key = e.target.getAttribute("data-key");
+  if (key) {
+    movePlayerByKey(key);
+    highlightKey(key, true);
+  }
+}
+
+function handleVirtualKeyUp(e) {
+  e.preventDefault();
+  const key = e.target.getAttribute("data-key");
+  if (key) {
+    highlightKey(key, false);
+  }
+}
 
 function movePlayer(newX, newY) {
   const newIndex = newY * mazeSize + newX;
@@ -302,3 +364,60 @@ function showPath() {
     });
   }, 1000);
 }
+
+function checkOrientation() {
+  const rotationMessage = document.getElementById("rotation-message");
+  const gameContainer = document.getElementById("game-container");
+  const loadingScreen = document.getElementById("loading-screen");
+  const endPopup = document.getElementById("end-popup");
+
+  if (window.innerWidth <= 768) {
+    if (window.orientation === 0 || window.orientation === 180) {
+      // Portrait mode
+      rotationMessage.classList.remove("hidden");
+      gameContainer.classList.add("hidden");
+      loadingScreen.classList.add("hidden");
+      endPopup.classList.add("hidden");
+    } else {
+      // Landscape mode
+      rotationMessage.classList.add("hidden");
+      loadingScreen.classList.remove("hidden");
+      if (!gameContainer.classList.contains("hidden")) {
+        gameContainer.classList.remove("hidden");
+        resizeMaze();
+      }
+      if (!endPopup.classList.contains("hidden")) {
+        endPopup.classList.remove("hidden");
+      }
+    }
+  } else {
+    // Desktop view
+    rotationMessage.classList.add("hidden");
+    loadingScreen.classList.remove("hidden");
+    if (!gameContainer.classList.contains("hidden")) {
+      resizeMaze();
+    }
+  }
+}
+
+function resizeMaze() {
+  const cellSize = calculateCellSize(mazeSize);
+  const mazeWidth = cellSize * mazeSize;
+
+  mazeContainer.style.width = `${mazeWidth}px`;
+  mazeContainer.style.height = `${mazeWidth}px`;
+
+  const cells = mazeContainer.querySelectorAll(".cell");
+  cells.forEach((cell) => {
+    cell.style.width = `${cellSize}px`;
+    cell.style.height = `${cellSize}px`;
+  });
+}
+
+// Call checkOrientation on page load and when the window is resized or orientation changes
+window.addEventListener("load", checkOrientation);
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("orientationchange", checkOrientation);
+window.addEventListener("resize", resizeMaze);
+
+window.addEventListener("resize", resizeMaze);

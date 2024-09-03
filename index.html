@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Maze Game</title>
     <link rel="stylesheet" href="styles.css" />
     <link
@@ -11,6 +14,9 @@
     />
   </head>
   <body>
+    <div id="rotation-message" class="hidden">
+      <p>Please rotate your device to landscape mode to play the game.</p>
+    </div>
     <div id="loading-screen">
       <h1 class="game-title">Maze Game</h1>
       <div class="difficulty-selector">
@@ -27,9 +33,17 @@
     <div id="neon-box-container"></div>
     <div id="game-container" class="hidden">
       <div id="maze-container"></div>
-      <div id="timer">Time: 0</div>
-      <button id="restart-button" onclick="initMaze()">Restart</button>
-      <button id="show-path-button" onclick="showPath()">Show Path</button>
+      <div class="controls-container">
+        <div id="timer">Time: 0</div>
+        <button id="restart-button" onclick="initMaze()">Restart</button>
+        <button id="show-path-button" onclick="showPath()">Show Path</button>
+        <div id="virtual-keyboard">
+          <button class="arrow-key" data-key="ArrowUp">U</button>
+          <button class="arrow-key" data-key="ArrowLeft">L</button>
+          <button class="arrow-key" data-key="ArrowDown">D</button>
+          <button class="arrow-key" data-key="ArrowRight">R</button>
+        </div>
+      </div>
     </div>
     <div id="message" class="hidden"></div>
     <div id="end-popup" class="hidden">
