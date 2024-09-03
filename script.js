@@ -348,3 +348,39 @@ function showPath() {
     });
   }, 1000);
 }
+
+function checkOrientation() {
+  const rotationMessage = document.getElementById("rotation-message");
+  const gameContainer = document.getElementById("game-container");
+  const loadingScreen = document.getElementById("loading-screen");
+  const endPopup = document.getElementById("end-popup");
+
+  if (window.innerWidth <= 768) {
+    if (window.orientation === 0 || window.orientation === 180) {
+      // Portrait mode
+      rotationMessage.classList.remove("hidden");
+      gameContainer.classList.add("hidden");
+      loadingScreen.classList.add("hidden");
+      endPopup.classList.add("hidden");
+    } else {
+      // Landscape mode
+      rotationMessage.classList.add("hidden");
+      loadingScreen.classList.remove("hidden");
+      if (!gameContainer.classList.contains("hidden")) {
+        gameContainer.classList.remove("hidden");
+      }
+      if (!endPopup.classList.contains("hidden")) {
+        endPopup.classList.remove("hidden");
+      }
+    }
+  } else {
+    // Desktop view
+    rotationMessage.classList.add("hidden");
+    loadingScreen.classList.remove("hidden");
+  }
+}
+
+// Call checkOrientation on page load and when the window is resized or orientation changes
+window.addEventListener("load", checkOrientation);
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("orientationchange", checkOrientation);
