@@ -25,29 +25,90 @@ function initMaze() {
   timerElement.classList.remove("hidden");
   messageElement.classList.remove("hidden");
   document.getElementById("restart-button").classList.remove("hidden");
+  document.getElementById("show-path-button").classList.remove("hidden");
   removeNeonBoxes();
 }
 
 // Generate a maze ensuring there's always a path from start to end
 function generateMaze(rows, cols) {
   const maze = Array.from({ length: rows }, () => Array(cols).fill("wall"));
-  const directions = [
-    [0, 1],
-    [1, 0],
-    [0, -1],
-    [-1, 0],
-  ];
-
-  function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
 
   function carvePath(x, y) {
     maze[y][x] = "path";
+    const directions = [
+      [0, 1],
+      [1, 0],
+      [0, -1],
+      [-1, 0],
+    ];
     shuffle(directions);
+    for (const [dx, dy] of directions) {
+      const nx = x + dx * 2;
+      const ny = y + dy * 2;
+      if (
+        ny >= 0 &&
+        ny < rows &&
+        nx >= 0 &&
+        nx < cols &&
+        maze[ny][nx] === "wall"
+      ) {
+        maze[y + dy][x + dx] = "path";
+        maze[ny][nx] = "path";
+        carvePath(nx, ny);
+      }
+    }
+  }
+
+  function clearAroundCell(x, y) {
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (ny >= 0 && ny < rows && nx >= 0 && nx < cols) {
+          maze[ny][nx] = "path";
+        }
+      }
+    }
+  }
+
+  carvePath(1, 1);
+
+  // Clear areas around start and end
+  clearAroundCell(0, 0);
+  clearAroundCell(cols - 1, rows - 1);
+
+  // Set start and end
+  maze[0][0] = "start";
+  maze[rows - 1][cols - 1] = "end";
+
+  return maze;
+}
+
+function findPath(maze, startX, startY, endX, endY) {
+  const rows = maze.length;
+  const cols = maze[0].length;
+  const queue = [[startX, startY]];
+  const visited = new Set();
+  const parent = new Map();
+
+  while (queue.length > 0) {
+    const [x, y] = queue.shift();
+    if (x === endX && y === endY) {
+      return reconstructPath(parent, startX, startY, endX, endY);
+    }
+
+    const key = `${x},${y}`;
+    if (visited.has(key)) continue;
+    visited.add(key);
+
+    const directions = [
+      [0, 1],
+      [1, 0],
+      [0, -1],
+      [-1, 0],
+    ];
+    shuffle(directions);
+
     for (const [dx, dy] of directions) {
       const nx = x + dx;
       const ny = y + dy;
@@ -56,49 +117,40 @@ function generateMaze(rows, cols) {
         ny < rows &&
         nx >= 0 &&
         nx < cols &&
-        maze[ny][nx] === "wall"
+        maze[ny][nx] !== "wall"
       ) {
-        maze[ny][nx] = "path";
-        carvePath(nx, ny);
+        const newKey = `${nx},${ny}`;
+        if (!visited.has(newKey)) {
+          queue.push([nx, ny]);
+          parent.set(newKey, key);
+        }
       }
     }
   }
 
-  carvePath(0, 0);
+  return []; // No path found
+}
 
-  // Ensure the end is reachable
-  let endX = cols - 1;
-  let endY = rows - 1;
-  while (maze[endY][endX] === "wall") {
-    if (endX > 0 && maze[endY][endX - 1] === "path") {
-      maze[endY][endX] = "path";
-    } else if (endY > 0 && maze[endY - 1][endX] === "path") {
-      maze[endY][endX] = "path";
-    } else {
-      endX--;
-      endY--;
-    }
+function reconstructPath(parent, startX, startY, endX, endY) {
+  const path = [];
+  let current = `${endX},${endY}`;
+  const start = `${startX},${startY}`;
+
+  while (current !== start) {
+    const [x, y] = current.split(",").map(Number);
+    path.unshift([x, y]);
+    current = parent.get(current);
   }
 
-  // Adjust wall density based on difficulty
-  const wallProbability = mazeSize <= 10 ? 0.2 : mazeSize <= 20 ? 0.3 : 0.4;
+  path.unshift([startX, startY]);
+  return path;
+}
 
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      if (
-        maze[y][x] === "path" &&
-        Math.random() < wallProbability &&
-        !(x === 0 && y === 0) &&
-        !(x === cols - 1 && y === rows - 1)
-      ) {
-        maze[y][x] = "wall";
-      }
-    }
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
-
-  maze[0][0] = "start";
-  maze[rows - 1][cols - 1] = "end";
-  return maze;
 }
 
 // Render the maze
@@ -227,3 +279,26 @@ function removeNeonBoxes() {
 // Initialize the game
 showLoadingScreen();
 createNeonBoxes();
+
+function showPath() {
+  const maze = Array.from({ length: mazeSize }, (_, y) =>
+    Array.from({ length: mazeSize }, (_, x) => {
+      const cell = mazeContainer.children[y * mazeSize + x];
+      return cell.classList.contains("wall") ? "wall" : "path";
+    })
+  );
+
+  const path = findPath(maze, 0, 0, mazeSize - 1, mazeSize - 1);
+
+  path.forEach(([x, y]) => {
+    const cell = mazeContainer.children[y * mazeSize + x];
+    cell.classList.add("path-highlight");
+  });
+
+  setTimeout(() => {
+    path.forEach(([x, y]) => {
+      const cell = mazeContainer.children[y * mazeSize + x];
+      cell.classList.remove("path-highlight");
+    });
+  }, 1000);
+}
