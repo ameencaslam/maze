@@ -11,7 +11,6 @@ let timer = 0;
 let interval;
 let mazeSize = 10;
 
-// Initialize the maze
 function initMaze() {
   mazeSize = parseInt(difficultySelect.value);
   const maze = generateMaze(mazeSize, mazeSize);
@@ -29,7 +28,6 @@ function initMaze() {
   removeNeonBoxes();
 }
 
-// Generate a maze ensuring there's always a path from start to end
 function generateMaze(rows, cols) {
   const maze = Array.from({ length: rows }, () => Array(cols).fill("wall"));
 
@@ -73,15 +71,12 @@ function generateMaze(rows, cols) {
 
   carvePath(1, 1);
 
-  // Clear areas around start and end
   clearAroundCell(0, 0);
   clearAroundCell(cols - 1, rows - 1);
 
-  // Set start and end
   maze[0][0] = "start";
   maze[rows - 1][cols - 1] = "end";
 
-  // After the maze is generated, remove some wall cells randomly
   removeRandomWalls(maze, rows, cols);
 
   return maze;
@@ -90,7 +85,6 @@ function generateMaze(rows, cols) {
 function removeRandomWalls(maze, rows, cols) {
   const wallCells = [];
 
-  // Collect all wall cells (excluding the outer walls)
   for (let y = 1; y < rows - 1; y++) {
     for (let x = 1; x < cols - 1; x++) {
       if (maze[y][x] === "wall") {
@@ -99,11 +93,9 @@ function removeRandomWalls(maze, rows, cols) {
     }
   }
 
-  // Shuffle the wall cells
   shuffle(wallCells);
 
-  // Remove a percentage of wall cells
-  const removalPercentage = 0.1; // Adjust this value to make it easier or harder
+  const removalPercentage = 0.1;
   const cellsToRemove = Math.floor(wallCells.length * removalPercentage);
 
   for (let i = 0; i < cellsToRemove; i++) {
@@ -156,7 +148,7 @@ function findPath(maze, startX, startY, endX, endY) {
     }
   }
 
-  return []; // No path found
+  return [];
 }
 
 function reconstructPath(parent, startX, startY, endX, endY) {
@@ -181,7 +173,6 @@ function shuffle(array) {
   }
 }
 
-// Render the maze
 function renderMaze(maze) {
   mazeContainer.innerHTML = "";
   const cellSize = calculateCellSize(mazeSize);
@@ -211,14 +202,12 @@ function calculateCellSize(mazeSize) {
   return Math.floor(maxSize / mazeSize);
 }
 
-// Place the player at the start position
 function placePlayer() {
   const startCell = mazeContainer.children[0];
   startCell.classList.add("player");
   playerPosition = { x: 0, y: 0 };
 }
 
-// Handle player movement
 document.addEventListener("keydown", handleKeyPress);
 document.addEventListener("keyup", handleKeyUp);
 
@@ -255,7 +244,6 @@ function highlightKey(key, isActive) {
   }
 }
 
-// Set up virtual keyboard
 const virtualKeyboard = document.getElementById("virtual-keyboard");
 virtualKeyboard.addEventListener("touchstart", handleVirtualKeyPress);
 virtualKeyboard.addEventListener("touchend", handleVirtualKeyUp);
@@ -301,7 +289,6 @@ function movePlayer(newX, newY) {
   }
 }
 
-// Start the timer
 function startTimer() {
   timer = 0;
   clearInterval(interval);
@@ -311,7 +298,6 @@ function startTimer() {
   }, 1000);
 }
 
-// Show loading screen
 function showLoadingScreen() {
   endPopup.classList.add("hidden");
   loadingScreen.classList.remove("hidden");
@@ -320,6 +306,18 @@ function showLoadingScreen() {
   timerElement.classList.add("hidden");
   messageElement.classList.add("hidden");
   document.getElementById("restart-button").classList.add("hidden");
+
+  loadingScreen.style.zIndex = "2001";
+  loadingScreen.style.pointerEvents = "auto";
+
+  const startButton = loadingScreen.querySelector(".start-button");
+  startButton.addEventListener("click", initMaze);
+
+  const difficultySelect = document.getElementById("difficulty");
+  difficultySelect.addEventListener("change", () => {
+    mazeSize = parseInt(difficultySelect.value);
+  });
+
   createNeonBoxes();
 }
 
@@ -335,7 +333,7 @@ function createNeonBoxes() {
   ];
   const numBoxes = 20;
 
-  container.innerHTML = ""; // Clear existing boxes
+  container.innerHTML = "";
 
   for (let i = 0; i < numBoxes; i++) {
     const box = document.createElement("div");
@@ -366,7 +364,6 @@ function removeNeonBoxes() {
   container.innerHTML = "";
 }
 
-// Initialize the game
 showLoadingScreen();
 createNeonBoxes();
 
@@ -401,13 +398,11 @@ function checkOrientation() {
 
   if (window.innerWidth <= 768) {
     if (window.orientation === 0 || window.orientation === 180) {
-      // Portrait mode
       rotationMessage.classList.remove("hidden");
       gameContainer.classList.add("hidden");
       loadingScreen.classList.add("hidden");
       endPopup.classList.add("hidden");
     } else {
-      // Landscape mode
       rotationMessage.classList.add("hidden");
       loadingScreen.classList.remove("hidden");
       if (!gameContainer.classList.contains("hidden")) {
@@ -419,7 +414,6 @@ function checkOrientation() {
       }
     }
   } else {
-    // Desktop view
     rotationMessage.classList.add("hidden");
     loadingScreen.classList.remove("hidden");
     if (!gameContainer.classList.contains("hidden")) {
@@ -442,7 +436,6 @@ function resizeMaze() {
   });
 }
 
-// Call checkOrientation on page load and when the window is resized or orientation changes
 window.addEventListener("load", checkOrientation);
 window.addEventListener("resize", checkOrientation);
 window.addEventListener("orientationchange", checkOrientation);
@@ -450,7 +443,6 @@ window.addEventListener("resize", resizeMaze);
 
 window.addEventListener("resize", resizeMaze);
 
-// Function to enter fullscreen
 function enterFullscreen() {
   const body = document.body;
   if (body.requestFullscreen) {
@@ -463,15 +455,12 @@ function enterFullscreen() {
     body.msRequestFullscreen();
   }
 
-  // Hide the fullscreen prompt
   document.getElementById("fullscreen-prompt").classList.add("hidden");
 
-  // Show loading screen immediately
   showLoadingScreen();
   createNeonBoxes();
 }
 
-// Modify the handleFullscreenChange function
 function handleFullscreenChange() {
   if (document.fullscreenElement) {
     console.log("Entered fullscreen mode");
@@ -484,7 +473,6 @@ function handleFullscreenChange() {
   }
 }
 
-// Modify the showLoadingScreen function
 function showLoadingScreen() {
   endPopup.classList.add("hidden");
   loadingScreen.classList.remove("hidden");
@@ -494,11 +482,9 @@ function showLoadingScreen() {
   messageElement.classList.add("hidden");
   document.getElementById("restart-button").classList.add("hidden");
 
-  // Ensure loading screen is visible and interactive
   loadingScreen.style.zIndex = "2001";
   loadingScreen.style.pointerEvents = "auto";
 
-  // Re-add event listeners
   const startButton = loadingScreen.querySelector(".start-button");
   startButton.addEventListener("click", initMaze);
 
@@ -506,15 +492,15 @@ function showLoadingScreen() {
   difficultySelect.addEventListener("change", () => {
     mazeSize = parseInt(difficultySelect.value);
   });
+
+  createNeonBoxes();
 }
 
-// Call this function on page load to show the fullscreen prompt
 window.addEventListener("load", () => {
   document.getElementById("fullscreen-prompt").classList.remove("hidden");
   checkOrientation();
 });
 
-// Add event listeners
 window.addEventListener("resize", () => {
   checkOrientation();
   resizeMaze();
