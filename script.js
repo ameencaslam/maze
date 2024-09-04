@@ -81,7 +81,35 @@ function generateMaze(rows, cols) {
   maze[0][0] = "start";
   maze[rows - 1][cols - 1] = "end";
 
+  // After the maze is generated, remove some wall cells randomly
+  removeRandomWalls(maze, rows, cols);
+
   return maze;
+}
+
+function removeRandomWalls(maze, rows, cols) {
+  const wallCells = [];
+
+  // Collect all wall cells (excluding the outer walls)
+  for (let y = 1; y < rows - 1; y++) {
+    for (let x = 1; x < cols - 1; x++) {
+      if (maze[y][x] === "wall") {
+        wallCells.push([x, y]);
+      }
+    }
+  }
+
+  // Shuffle the wall cells
+  shuffle(wallCells);
+
+  // Remove a percentage of wall cells
+  const removalPercentage = 0.1; // Adjust this value to make it easier or harder
+  const cellsToRemove = Math.floor(wallCells.length * removalPercentage);
+
+  for (let i = 0; i < cellsToRemove; i++) {
+    const [x, y] = wallCells[i];
+    maze[y][x] = "path";
+  }
 }
 
 function findPath(maze, startX, startY, endX, endY) {
