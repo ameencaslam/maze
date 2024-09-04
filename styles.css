@@ -459,3 +459,19 @@ select:hover {
     height: 100%;
   }
 }
+
+#fullscreen-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(26, 26, 46, 0.9);
+  z-index: 5000;
+  color: #fff;
+  text-align: center;
+}
